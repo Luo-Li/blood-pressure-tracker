@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血压记录管理系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/assets/styles/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header class="navbar">
+            <div class="navbar-brand">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                <span class="brand-name">血压记录</span>
+            </div>
+            <nav class="navbar-menu">
+                <button class="nav-item active" data-page="record">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 4v16m-8-8h16"/>
+                    </svg>
+                    <span>记录血压</span>
+                </button>
+                <button class="nav-item" data-page="history">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>历史记录</span>
+                </button>
+                <button class="nav-item" data-page="statistics">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>数据统计</span>
+                </button>
+                <button class="nav-item" data-page="chart">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                    </svg>
+                    <span>图表分析</span>
+                </button>
+            </nav>
+            <div class="navbar-actions">
+                <button class="action-btn" id="exportBtn" title="导出数据">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                </button>
+                <button class="action-btn" id="importBtn" title="导入数据">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 移动端底部导航 -->
+        <nav class="bottom-nav">
+            <button class="bottom-nav-item active" data-page="record">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 4v16m-8-8h16"/>
+                </svg>
+                <span>记录</span>
+            </button>
+            <button class="bottom-nav-item" data-page="history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>历史</span>
+            </button>
+            <button class="bottom-nav-item" data-page="statistics">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>统计</span>
+            </button>
+            <button class="bottom-nav-item" data-page="chart">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                </svg>
+                <span>图表</span>
+            </button>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 记录血压页面 -->
+            <section id="page-record" class="page active">
+                <div class="page-header">
+                    <h1>记录血压</h1>
+                    <p class="page-description">请填写以下信息以记录您的血压数据</p>
+                </div>
+                <div class="form-container">
+                    <form id="bpForm" class="bp-form">
+                        <div class="form-group">
+                            <label class="form-label">记录类型 <span class="required">*</span></label>
+                            <div class="record-type-selector">
+                                <label class="radio-card morning">
+                                    <input type="radio" name="recordType" value="morning" checked>
+                                    <span class="radio-icon">🌅</span>
+                                    <span class="radio-label">早晨</span>
+                                    <span class="radio-desc">起床后测量</span>
+                                </label>
+                                <label class="radio-card evening">
+                                    <input type="radio" name="recordType" value="evening">
+                                    <span class="radio-icon">🌙</span>
+                                    <span class="radio-label">晚上</span>
+                                    <span class="radio-desc">睡前测量</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="systolic" class="form-label">
+                                    收缩压 (mmHg) <span class="required">*</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="number" 
+                                        id="systolic" 
+                                        name="systolic" 
+                                        min="90" 
+                                        max="180" 
+                                        required
+                                        placeholder="90-180"
+                                        class="form-input"
+                                    >
+                                    <span class="input-unit">mmHg</span>
+                                </div>
+                                <span class="form-hint">正常范围: 90-180 mmHg</span>
+                                <span class="form-error" id="systolicError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="diastolic" class="form-label">
+                                    舒张压 (mmHg) <span class="required">*</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="number" 
+                                        id="diastolic" 
+                                        name="diastolic" 
+                                        min="60" 
+                                        max="120" 
+                                        required
+                                        placeholder="60-120"
+                                        class="form-input"
+                                    >
+                                    <span class="input-unit">mmHg</span>
+                                </div>
+                                <span class="form-hint">正常范围: 60-120 mmHg</span>
+                                <span class="form-error" id="diastolicError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="heartRate" class="form-label">
+                                心率 (次/分钟) <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="heartRate" 
+                                    name="heartRate" 
+                                    min="40" 
+                                    max="160" 
+                                    required
+                                    placeholder="40-160"
+                                    class="form-input"
+                                >
+                                <span class="input-unit">bpm</span>
+                            </div>
+                            <span class="form-hint">正常范围: 40-160 次/分钟</span>
+                            <span class="form-error" id="heartRateError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes" class="form-label">备注 (可选)</label>
+                            <textarea 
+                                id="notes" 
+                                name="notes" 
+                                rows="3" 
+                                maxlength="200"
+                                placeholder="添加备注信息..."
+                                class="form-textarea"
+                            ></textarea>
+                            <span class="form-hint"><span id="notesCount">0</span>/200字符</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 13l4 4L19 7"/>
+                                </svg>
+                                保存记录
+                            </button>
+                            <button type="reset" class="btn btn-secondary btn-lg">重置表单</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 历史记录页面 -->
+            <section id="page-history" class="page">
+                <div class="page-header">
+                    <h1>历史记录</h1>
+                    <p class="page-description">查看和管理您的血压记录</p>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>日期范围</label>
+                        <input type="date" id="filterStartDate" class="form-input">
+                        <span>至</span>
+                        <input type="date" id="filterEndDate" class="form-input">
+                    </div>
+                    <div class="filter-group">
+                        <label>记录类型</label>
+                        <select id="filterRecordType" class="form-select">
+                            <option value="">全部</option>
+                            <option value="morning">早晨</option>
+                            <option value="evening">晚上</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" id="applyFilter">筛选</button>
+                        <button class="btn btn-secondary" id="clearFilter">清除</button>
+                    </div>
+                </div>
+
+                <div class="records-container">
+                    <div class="records-list" id="recordsList">
+                        <!-- 记录列表将通过JS渲染 -->
+                    </div>
+                    
+                    <div class="pagination" id="pagination">
+                        <!-- 分页控件将通过JS渲染 -->
+                    </div>
+                </div>
+
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3>暂无记录</h3>
+                    <p>点击上方的"记录血压"开始添加您的第一条记录</p>
+                </div>
+            </section>
+
+            <!-- 数据统计页面 -->
+            <section id="page-statistics" class="page">
+                <div class="page-header">
+                    <h1>数据统计</h1>
+                    <p class="page-description">查看您的血压数据统计信息</p>
+                </div>
+
+                <div class="time-range-selector">
+                    <button class="time-btn active" data-range="7">近7天</button>
+                    <button class="time-btn" data-range="30">近1个月</button>
+                    <button class="time-btn" data-range="365">近1年</button>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <!-- 统计卡片将通过JS渲染 -->
+                </div>
+
+                <div class="stats-table-container">
+                    <h3 id="statsTableTitle">近期数据统计</h3>
+                    <table class="stats-table" id="statsTable">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>平均收缩压</th>
+                                <th>平均舒张压</th>
+                                <th>平均心率</th>
+                                <th>记录数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                            <!-- 统计表格将通过JS渲染 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 图表分析页面 -->
+            <section id="page-chart" class="page">
+                <div class="page-header">
+                    <h1>图表分析</h1>
+                    <p class="page-description">可视化查看您的血压变化趋势</p>
+                </div>
+
+                <div class="chart-controls">
+                    <div class="control-group">
+                        <label>时间范围</label>
+                        <select id="chartTimeRange" class="form-select">
+                            <option value="7">近7天</option>
+                            <option value="30" selected>近1个月</option>
+                            <option value="365">近1年</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>显示维度</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="showMorning" checked>
+                                <span class="checkmark"></span>
+                                早晨
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="showEvening" checked>
+                                <span class="checkmark"></span>
+                                晚上
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>血压指标</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="showSystolic" checked>
+                                <span class="checkmark"></span>
+                                收缩压
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="showDiastolic" checked>
+                                <span class="checkmark"></span>
+                                舒张压
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>导出</label>
+                        <div class="export-buttons">
+                            <button class="btn btn-sm" id="exportCSV">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                    <path d="M14 2v6h6M8 13h8M8 17h8"/>
+                                </svg>
+                                CSV
+                            </button>
+                            <button class="btn btn-sm" id="exportPNG">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                PNG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="bloodPressureChart"></canvas>
+                </div>
+
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color morning-bg"></span>
+                        <span>早晨记录</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color evening-bg"></span>
+                        <span>晚上记录</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-line systolic-line"></span>
+                        <span>收缩压</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-line diastolic-line"></span>
+                        <span>舒张压</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 编辑记录模态框 -->
+        <div class="modal" id="editModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>编辑记录</h2>
+                    <button class="modal-close" id="closeEditModal">&times;</button>
+                </div>
+                <form id="editForm" class="bp-form">
+                    <input type="hidden" id="editId">
+                    <div class="form-group">
+                        <label class="form-label">记录类型</label>
+                        <div class="record-type-selector">
+                            <label class="radio-card morning">
+                                <input type="radio" name="editRecordType" value="morning">
+                                <span class="radio-icon">🌅</span>
+                                <span class="radio-label">早晨</span>
+                            </label>
+                            <label class="radio-card evening">
+                                <input type="radio" name="editRecordType" value="evening">
+                                <span class="radio-icon">🌙</span>
+                                <span class="radio-label">晚上</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editSystolic" class="form-label">收缩压 (mmHg)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="editSystolic" name="systolic" min="90" max="180" required class="form-input">
+                                <span class="input-unit">mmHg</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editDiastolic" class="form-label">舒张压 (mmHg)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="editDiastolic" name="diastolic" min="60" max="120" required class="form-input">
+                                <span class="input-unit">mmHg</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editHeartRate" class="form-label">心率 (bpm)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="editHeartRate" name="heartRate" min="40" max="160" required class="form-input">
+                            <span class="input-unit">bpm</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editNotes" class="form-label">备注</label>
+                        <textarea id="editNotes" name="notes" rows="3" maxlength="200" class="form-textarea"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">保存修改</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEdit">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 删除确认对话框 -->
+        <div class="confirm-dialog" id="deleteConfirm">
+            <div class="confirm-overlay"></div>
+            <div class="confirm-content">
+                <div class="confirm-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3>确认删除</h3>
+                <p>确定要删除这条血压记录吗？此操作无法撤销。</p>
+                <div class="confirm-actions">
+                    <button class="btn btn-danger" id="confirmDelete">删除</button>
+                    <button class="btn btn-secondary" id="cancelDelete">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据导入模态框 -->
+        <div class="modal" id="importModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>导入数据</h2>
+                    <button class="modal-close" id="closeImportModal">&times;</button>
+                </div>
+                <div class="import-content">
+                    <div class="import-options">
+                        <div class="import-option" id="importJson">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                            </svg>
+                            <span>导入 JSON 文件</span>
+                        </div>
+                        <div class="import-option" id="importCsv">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <path d="M14 2v6h6M8 13h8M8 17h8"/>
+                            </svg>
+                            <span>导入 CSV 文件</span>
+                        </div>
+                    </div>
+                    <input type="file" id="importFile" accept=".json,.csv" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据导出模态框 -->
+        <div class="modal" id="exportModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>导出数据</h2>
+                    <button class="modal-close" id="closeExportModal">&times;</button>
+                </div>
+                <div class="export-content">
+                    <p>选择导出格式：</p>
+                    <div class="export-options">
+                        <button class="export-option" id="exportJson">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <path d="M14 2v6h6"/>
+                            </svg>
+                            <span>JSON 格式</span>
+                            <small>完整数据备份</small>
+                        </button>
+                        <button class="export-option" id="exportCsvFormat">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                <path d="M14 2v6h6M8 13h8M8 17h8"/>
+                            </svg>
+                            <span>CSV 格式</span>
+                            <small>表格数据</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast 消息提示 -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- 备份提醒 -->
+        <div class="backup-reminder" id="backupReminder" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span>您已经有30天没有备份数据了，建议及时备份！</span>
+            <button class="reminder-close" id="closeBackupReminder">&times;</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>
