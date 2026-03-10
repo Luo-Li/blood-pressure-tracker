@@ -649,34 +649,49 @@ class BloodPressureApp {
         };
 
         // 渲染统计卡片
+        const formatStat = (stat, key) => stat ? stat[key] : '--';
+        
         const statsGrid = document.getElementById('statsGrid');
-        statsGrid.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-card-title">早晨平均收缩压</div>
-                <div class="stat-card-value morning">${stats.morning.systolic || '--'}<span class="stat-card-unit">mmHg</span></div>
-                <div class="stat-card-subtitle">最高: ${stats.morning.systolicMax || '--'} / 最低: ${stats.morning.systolicMin || '--'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-title">早晨平均舒张压</div>
-                <div class="stat-card-value morning">${stats.morning.diastolic || '--'}<span class="stat-card-unit">mmHg</span></div>
-                <div class="stat-card-subtitle">最高: ${stats.morning.diastolicMax || '--'} / 最低: ${stats.morning.diastolicMin || '--'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-title">晚上平均收缩压</div>
-                <div class="stat-card-value evening">${stats.evening.systolic || '--'}<span class="stat-card-unit">mmHg</span></div>
-                <div class="stat-card-subtitle">最高: ${stats.evening.systolicMax || '--'} / 最低: ${stats.evening.systolicMin || '--'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-title">晚上平均舒张压</div>
-                <div class="stat-card-value evening">${stats.evening.diastolic || '--'}<span class="stat-card-unit">mmHg</span></div>
-                <div class="stat-card-subtitle">最高: ${stats.evening.diastolicMax || '--'} / 最低: ${stats.evening.diastolicMin || '--'}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-title">平均心率</div>
-                <div class="stat-card-value">${stats.overall.heartRate || '--'}<span class="stat-card-unit">bpm</span></div>
-                <div class="stat-card-subtitle">总记录数: ${filteredRecords.length}</div>
-            </div>
-        `;
+        
+        if (filteredRecords.length === 0) {
+            statsGrid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <h3>暂无统计数据</h3>
+                    <p>请先添加血压记录后再查看统计数据</p>
+                </div>
+            `;
+        } else {
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-title">早晨平均收缩压</div>
+                    <div class="stat-card-value morning">${formatStat(stats.morning, 'systolic')}<span class="stat-card-unit">mmHg</span></div>
+                    <div class="stat-card-subtitle">最高: ${formatStat(stats.morning, 'systolicMax')} / 最低: ${formatStat(stats.morning, 'systolicMin')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">早晨平均舒张压</div>
+                    <div class="stat-card-value morning">${formatStat(stats.morning, 'diastolic')}<span class="stat-card-unit">mmHg</span></div>
+                    <div class="stat-card-subtitle">最高: ${formatStat(stats.morning, 'diastolicMax')} / 最低: ${formatStat(stats.morning, 'diastolicMin')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">晚上平均收缩压</div>
+                    <div class="stat-card-value evening">${formatStat(stats.evening, 'systolic')}<span class="stat-card-unit">mmHg</span></div>
+                    <div class="stat-card-subtitle">最高: ${formatStat(stats.evening, 'systolicMax')} / 最低: ${formatStat(stats.evening, 'systolicMin')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">晚上平均舒张压</div>
+                    <div class="stat-card-value evening">${formatStat(stats.evening, 'diastolic')}<span class="stat-card-unit">mmHg</span></div>
+                    <div class="stat-card-subtitle">最高: ${formatStat(stats.evening, 'diastolicMax')} / 最低: ${formatStat(stats.evening, 'diastolicMin')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">平均心率</div>
+                    <div class="stat-card-value">${formatStat(stats.overall, 'heartRate')}<span class="stat-card-unit">bpm</span></div>
+                    <div class="stat-card-subtitle">总记录数: ${filteredRecords.length}</div>
+                </div>
+            `;
+        }
 
         // 渲染统计表格
         this.renderStatsTable(filteredRecords, days);
