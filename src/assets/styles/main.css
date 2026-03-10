@@ -1223,10 +1223,6 @@ body {
 
 /* 响应式设计 */
 @media (max-width: 1199px) {
-    .navbar-menu {
-        display: none;
-    }
-    
     .main-content {
         padding: 16px;
     }
