@@ -326,6 +326,17 @@ body {
     gap: 16px;
 }
 
+/* 日期时间选择器 */
+.datetime-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.datetime-selector input {
+    width: 100%;
+}
+
 .radio-card {
     position: relative;
     display: flex;

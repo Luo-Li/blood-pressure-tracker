@@ -52,8 +52,22 @@ class BloodPressureApp {
     init() {
         this.loadRecords();
         this.bindEvents();
+        this.initDateTimePicker();
         this.navigateTo('record');
         this.checkBackupReminder();
+    }
+
+    /**
+     * 初始化日期时间选择器
+     */
+    initDateTimePicker() {
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().slice(0, 5);
+        
+        document.getElementById('recordDate').value = dateStr;
+        document.getElementById('recordDate').max = dateStr;
+        document.getElementById('recordTime').value = timeStr;
     }
 
     /**
@@ -265,9 +279,26 @@ class BloodPressureApp {
             return;
         }
 
+        const recordDate = document.getElementById('recordDate').value;
+        const recordTime = document.getElementById('recordTime').value;
+        
+        if (!recordDate || !recordTime) {
+            this.showFieldError('datetime', '请选择日期和时间');
+            this.showToast('请选择测量日期和时间', 'error');
+            return;
+        }
+
+        const timestamp = new Date(`${recordDate}T${recordTime}`);
+        
+        if (isNaN(timestamp.getTime())) {
+            this.showFieldError('datetime', '日期时间格式无效');
+            this.showToast('日期时间格式无效', 'error');
+            return;
+        }
+
         const record = {
             id: this.generateId(),
-            timestamp: new Date(),
+            timestamp: timestamp,
             recordType: formData.get('recordType'),
             systolic: parseInt(formData.get('systolic')),
             diastolic: parseInt(formData.get('diastolic')),
@@ -276,10 +307,12 @@ class BloodPressureApp {
         };
 
         this.records.unshift(record);
+        this.records.sort((a, b) => b.timestamp - a.timestamp);
         
         if (this.saveRecords()) {
             this.showToast('记录已保存', 'success');
             form.reset();
+            this.initDateTimePicker();
             document.getElementById('notesCount').textContent = '0';
             document.querySelector('input[name="recordType"][value="morning"]').checked = true;
         }
@@ -487,6 +520,14 @@ class BloodPressureApp {
         document.getElementById('editHeartRate').value = record.heartRate;
         document.getElementById('editNotes').value = record.notes;
 
+        const timestamp = new Date(record.timestamp);
+        const dateStr = timestamp.toISOString().split('T')[0];
+        const timeStr = timestamp.toTimeString().slice(0, 5);
+        
+        document.getElementById('editRecordDate').value = dateStr;
+        document.getElementById('editRecordDate').max = new Date().toISOString().split('T')[0];
+        document.getElementById('editRecordTime').value = timeStr;
+
         document.getElementById('editModal').classList.add('active');
     }
 
@@ -510,6 +551,21 @@ class BloodPressureApp {
         const heartRate = parseInt(document.getElementById('editHeartRate').value);
         const notes = document.getElementById('editNotes').value;
 
+        const editRecordDate = document.getElementById('editRecordDate').value;
+        const editRecordTime = document.getElementById('editRecordTime').value;
+        
+        if (!editRecordDate || !editRecordTime) {
+            this.showToast('请选择日期和时间', 'error');
+            return;
+        }
+
+        const timestamp = new Date(`${editRecordDate}T${editRecordTime}`);
+        
+        if (isNaN(timestamp.getTime())) {
+            this.showToast('日期时间格式无效', 'error');
+            return;
+        }
+
         if (systolic < APP_CONFIG.SYSTOLIC_MIN || systolic > APP_CONFIG.SYSTOLIC_MAX ||
             diastolic < APP_CONFIG.DIASTOLIC_MIN || diastolic > APP_CONFIG.DIASTOLIC_MAX ||
             heartRate < APP_CONFIG.HEART_RATE_MIN || heartRate > APP_CONFIG.HEART_RATE_MAX) {
@@ -521,12 +577,15 @@ class BloodPressureApp {
         if (index !== -1) {
             this.records[index] = {
                 ...this.records[index],
+                timestamp: timestamp,
                 recordType,
                 systolic,
                 diastolic,
                 heartRate,
                 notes
             };
+            
+            this.records.sort((a, b) => b.timestamp - a.timestamp);
             
             if (this.saveRecords()) {
                 this.showToast('记录已更新', 'success');
