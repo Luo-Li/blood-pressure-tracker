@@ -1,0 +1,25 @@
+{
+  "name": "血压记录管理系统",
+  "short_name": "血压记录",
+  "description": "一款专业、安全、易用的血压数据管理应用",
+  "start_url": "/blood-pressure-tracker/",
+  "display": "standalone",
+  "background_color": "#F5F7FA",
+  "theme_color": "#1976D2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%231976D2' width='192' height='192' rx='32'/><path fill='white' d='M96 32c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm0 112c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm0-80c-17.7 0-32 14.3-32 32s14.3 32 32 32 32-14.3 32-32-14.3-32-32-32z'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%231976D2' width='512' height='512' rx='64'/><path fill='white' d='M256 64c-106 0-192 86-192 192s86 192 192 192 192-86 192-192S362 64 256 64zm0 336c-79.4 0-144-64.6-144-144s64.6-144 144-144 144 64.6 144 144-64.6 144-144 144zm0-240c-53 0-96 43-96 96s43 96 96 96 96-43 96-96-43-96-96-96z'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["medical", "health", "fitness"],
+  "lang": "zh-CN",
+  "scope": "/blood-pressure-tracker/"
+}
